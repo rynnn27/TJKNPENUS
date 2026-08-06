@@ -170,6 +170,7 @@
   .file-empty{font-size:12.5px;color:var(--text-muted);margin-bottom:10px;}
   label.file-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-elev-2);color:var(--text);padding:8px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;}
   label.file-btn:hover{border-color:var(--text-dim);}
+  label.file-btn.sm{padding:7px 11px;font-size:12.5px;}
   .uploading-txt{font-size:12.5px;color:var(--jaringan);}
 
   .quiz-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
@@ -374,30 +375,37 @@ let state = {
   extra:[],
   progress:{},
   scores:{},
-  filesIndex:{},
+  links:{},
   modalNode:null,
   quizCat:null,
   quizIdx:0,
   quizAnswers:[],
   quizPicked:null,
   showUploadForm:false,
-  uploadingId:null,
 };
-
-const MAX_FILE_BYTES = 3.5 * 1024 * 1024;
 
 async function loadStorage(){
   try{ const ex = await window.storage.get('materi-tambahan', true); state.extra = ex ? JSON.parse(ex.value) : []; }catch(e){ state.extra = []; }
   try{ const pr = await window.storage.get('progress', false); state.progress = pr ? JSON.parse(pr.value) : {}; }catch(e){ state.progress = {}; }
   try{ const sc = await window.storage.get('quiz-scores', false); state.scores = sc ? JSON.parse(sc.value) : {}; }catch(e){ state.scores = {}; }
-  try{ const fi = await window.storage.get('materi-files-index', true); state.filesIndex = fi ? JSON.parse(fi.value) : {}; }catch(e){ state.filesIndex = {}; }
+  try{ const lk = await window.storage.get('materi-links', true); state.links = lk ? JSON.parse(lk.value) : {}; }catch(e){ state.links = {}; }
 }
 async function saveExtra(){ try{ await window.storage.set('materi-tambahan', JSON.stringify(state.extra), true); }catch(e){} }
 async function saveProgress(){ try{ await window.storage.set('progress', JSON.stringify(state.progress), false); }catch(e){} }
 async function saveScores(){ try{ await window.storage.set('quiz-scores', JSON.stringify(state.scores), false); }catch(e){} }
-async function saveFilesIndex(){ try{ await window.storage.set('materi-files-index', JSON.stringify(state.filesIndex), true); }catch(e){} }
+async function saveLinks(){ try{ await window.storage.set('materi-links', JSON.stringify(state.links), true); }catch(e){} }
 
 function allMaterials(){ return MATERIALS.concat(state.extra); }
+function materialLink(m){ return state.links[m.id] || m.link || ''; }
+async function setMaterialLink(id){
+  const current = state.links[id] || (allMaterials().find(x=>x.id===id)||{}).link || '';
+  const url = window.prompt('Tempel link Google Drive (atau link lain) untuk materi ini:', current);
+  if(url===null) return;
+  const trimmed = url.trim();
+  if(trimmed){ state.links[id] = trimmed; } else { delete state.links[id]; }
+  await saveLinks();
+  render();
+}
 function materialsByCat(cat){ return allMaterials().filter(m=>m.cat===cat); }
 function laneProgress(cat){
   const items = materialsByCat(cat);
@@ -411,61 +419,6 @@ function overallProgress(){
   const done = items.filter(m=>state.progress[m.id]).length;
   return Math.round(done/items.length*100);
 }
-function fmtSize(bytes){
-  if(!bytes) return '';
-  if(bytes < 1024*1024) return Math.round(bytes/1024)+' KB';
-  return (bytes/(1024*1024)).toFixed(1)+' MB';
-}
-
-/* ===================== FILE UPLOAD (PPT/PDF) ===================== */
-function fileToDataUrl(file){
-  return new Promise((resolve,reject)=>{
-    const r = new FileReader();
-    r.onload = ()=>resolve(r.result);
-    r.onerror = ()=>reject(new Error('read failed'));
-    r.readAsDataURL(file);
-  });
-}
-async function attachFile(id, file){
-  if(!file) return false;
-  if(file.size > MAX_FILE_BYTES){
-    alert('Ukuran file terlalu besar. Maksimal sekitar 3.5MB per file (PPT/PDF).');
-    return false;
-  }
-  try{
-    const dataUrl = await fileToDataUrl(file);
-    await window.storage.set('materi-file:'+id, JSON.stringify({name:file.name,type:file.type,dataUrl}), true);
-    state.filesIndex[id] = {name:file.name,type:file.type,size:file.size};
-    await saveFilesIndex();
-    return true;
-  }catch(e){
-    alert('Gagal mengunggah file. Coba file yang lebih kecil atau format PDF/PPT/PPTX.');
-    return false;
-  }
-}
-async function onModalFileChange(event, id){
-  const file = event.target.files[0];
-  if(!file) return;
-  state.uploadingId = id;
-  render();
-  await attachFile(id, file);
-  state.uploadingId = null;
-  render();
-}
-async function downloadFile(id){
-  try{
-    const res = await window.storage.get('materi-file:'+id, true);
-    if(!res){ alert('File tidak ditemukan.'); return; }
-    const data = JSON.parse(res.value);
-    const a = document.createElement('a');
-    a.href = data.dataUrl;
-    a.download = data.name;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }catch(e){ alert('Gagal mengunduh file.'); }
-}
-
 /* ===================== RENDER: NAV ===================== */
 function renderNav(){
   const items = [['dashboard','Dashboard'],['materi','Materi'],['kuis','Kuis']];
@@ -557,13 +510,13 @@ function renderMateri(){
 function renderCard(m,i,cat){
   const done = !!state.progress[m.id];
   const isExtra = m.id.startsWith('x');
-  const hasFile = !!state.filesIndex[m.id];
+  const link = materialLink(m);
   return `
   <div class="card" style="--pc:${cat.color}">
     <div class="card-top">
       <span class="card-num">${isExtra? '＋' : String(i+1).padStart(2,'0')}</span>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
-        ${hasFile? '<span class="badge-file">📎 File</span>' : ''}
+        ${link? '<span class="badge-file">🔗 Link</span>' : ''}
         ${done? '<span class="badge-done">Selesai</span>' : (isExtra? '<span class="badge-extra">Tambahan</span>' : '')}
       </div>
     </div>
@@ -571,6 +524,9 @@ function renderCard(m,i,cat){
     <p>${escapeHtml(m.desc||'')}</p>
     <div class="card-actions">
       <button class="btn primary sm" style="--pc:${cat.color}" onclick="openNode('${m.id}')">Lihat Materi</button>
+      ${link
+        ? `<a class="btn sm ghost" href="${escapeAttr(link)}" target="_blank" rel="noopener">Buka Materi ↗</a>`
+        : `<button class="btn sm ghost" onclick="setMaterialLink('${m.id}')">+ Tambah Link Drive</button>`}
     </div>
   </div>`;
 }
@@ -579,7 +535,7 @@ function renderUploadForm(){
   return `
   <div class="panel">
     <h3>Tambah Materi</h3>
-    <div class="hint">Materi tambahan akan tampil untuk semua pengguna di kategori yang dipilih. Kamu juga bisa langsung melampirkan file PPT/PDF.</div>
+    <div class="hint">Materi tambahan akan tampil untuk semua pengguna di kategori yang dipilih.</div>
     <div class="field">
       <label>Kategori</label>
       <select id="up-cat">
@@ -595,13 +551,9 @@ function renderUploadForm(){
       <textarea id="up-desc" placeholder="Ringkasan singkat isi materi ini..."></textarea>
     </div>
     <div class="field">
-      <label>Tautan Materi (opsional)</label>
-      <input id="up-link" type="text" placeholder="https://...">
-    </div>
-    <div class="field">
-      <label>Lampiran PPT/PDF (opsional)</label>
-      <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation">
-      <div class="filehint">Maksimal sekitar 3.5MB per file.</div>
+      <label>Link Materi — Google Drive, PPT, PDF, dsb (opsional)</label>
+      <input id="up-link" type="text" placeholder="https://drive.google.com/...">
+      <div class="filehint">Tempel link share dari Google Drive. Pastikan akses diatur "siapa saja yang memiliki link".</div>
     </div>
     <button class="btn primary" id="up-submit-btn" onclick="submitUpload()">Simpan Materi</button>
   </div>`;
@@ -615,19 +567,13 @@ async function submitUpload(){
   const title = document.getElementById('up-title').value.trim();
   const desc = document.getElementById('up-desc').value.trim();
   const link = document.getElementById('up-link').value.trim();
-  const fileInput = document.getElementById('up-file');
-  const file = fileInput.files[0];
   if(!title){ alert('Judul materi wajib diisi.'); return; }
-  if(file && file.size > MAX_FILE_BYTES){
-    alert('Ukuran file terlalu besar. Maksimal sekitar 3.5MB per file (PPT/PDF).');
-    return;
-  }
   const btn = document.getElementById('up-submit-btn');
   if(btn){ btn.disabled = true; btn.textContent = 'Menyimpan...'; }
   const id = 'x' + Date.now();
-  state.extra.push({id,cat,title,desc,link: link||undefined});
+  state.extra.push({id,cat,title,desc});
   await saveExtra();
-  if(file){ await attachFile(id, file); }
+  if(link){ state.links[id] = link; await saveLinks(); }
   state.showUploadForm=false;
   state.materiCat=cat;
   render();
@@ -642,8 +588,7 @@ function renderModal(){
   if(!m) return '';
   const cat = CATS[m.cat];
   const done = !!state.progress[m.id];
-  const fileInfo = state.filesIndex[m.id];
-  const isUploading = state.uploadingId===m.id;
+  const link = materialLink(m);
   return `
   <div class="overlay" onclick="if(event.target===this) closeModal()">
     <div class="modal">
@@ -653,26 +598,19 @@ function renderModal(){
       </div>
       <h3>${escapeHtml(m.title)}</h3>
       <p class="desc">${escapeHtml(m.desc||'Belum ada deskripsi untuk materi ini.')}</p>
-      ${m.link? `<a class="link-out" href="${escapeAttr(m.link)}" target="_blank" rel="noopener">Buka Modul ↗</a>` : ''}
 
       <div class="file-box">
-        ${fileInfo? `
+        ${link? `
           <div class="file-info">
-            <span><span class="fname">📎 ${escapeHtml(fileInfo.name)}</span><span class="fsize">${fmtSize(fileInfo.size)}</span></span>
-            <button class="btn sm" onclick="downloadFile('${m.id}')">Unduh</button>
+            <span class="fname">🔗 Materi tertaut</span>
+            <a class="btn sm" href="${escapeAttr(link)}" target="_blank" rel="noopener">Buka ↗</a>
           </div>
           <div style="margin-top:10px;">
-            ${isUploading? `<span class="uploading-txt">Mengunggah file baru…</span>` : `
-            <label class="file-btn">Ganti File
-              <input type="file" accept=".pdf,.ppt,.pptx" style="display:none" onchange="onModalFileChange(event,'${m.id}')">
-            </label>`}
+            <button class="btn sm ghost" onclick="setMaterialLink('${m.id}')">Ubah Link</button>
           </div>
         ` : `
-          <div class="file-empty">Belum ada lampiran PPT/PDF untuk materi ini.</div>
-          ${isUploading? `<span class="uploading-txt">Mengunggah file…</span>` : `
-          <label class="file-btn">Unggah PPT/PDF
-            <input type="file" accept=".pdf,.ppt,.pptx" style="display:none" onchange="onModalFileChange(event,'${m.id}')">
-          </label>`}
+          <div class="file-empty">Belum ada link materi (PPT/PDF di Google Drive) untuk topik ini.</div>
+          <button class="btn sm" onclick="setMaterialLink('${m.id}')">+ Tambah Link Drive</button>
         `}
       </div>
 
