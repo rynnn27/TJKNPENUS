@@ -3,237 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Pembelajaran - Fiber Optik</title>
+    <title>Modul 01 - Dasar Fiber Optik</title>
     <style>
-        /* Pengaturan Dasar */
         :root {
             --bg-main: #09111e;
             --bg-card: #121b2b;
-            --bg-number: #172336;
             --text-blue: #38bdf8;
             --text-white: #f8fafc;
             --text-gray: #94a3b8;
-            --line-color: #1e293b;
+            --btn-bg: #1e293b;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-white);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 0;
+            line-height: 1.6;
         }
 
-        /* Header / Judul Utama */
-        header {
-            text-align: center;
-            padding: 40px 20px 20px;
-        }
-        header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-        header p {
-            color: var(--text-gray);
-            font-size: 1rem;
-        }
-
-        /* Container Peta Pembelajaran */
-        .roadmap-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Layout Grid 2 Kolom */
-        .roadmap-grid {
-            display: flex;
-            position: relative;
-        }
-        .col-left, .col-right {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .col-left {
-            padding-right: 30px;
-        }
-        .col-right {
-            padding-left: 30px;
-        }
-
-        /* Garis Tengah & Lencana 'LANJUT' */
-        .col-center {
-            width: 2px;
-            background-color: var(--line-color);
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 0;
-        }
-        .badge {
-            background-color: var(--bg-main);
-            color: var(--text-gray);
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            z-index: 1;
-        }
-
-        /* Desain Kartu Modul */
-        .card {
-            display: flex;
-            align-items: center;
+        /* Navigasi Atas */
+        .navbar {
             background-color: var(--bg-card);
-            padding: 15px;
-            border-radius: 10px;
-            text-decoration: none; /* Menghilangkan garis bawah pada link */
-            color: inherit;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
         }
-        .card:hover {
-            transform: translateY(-3px);
-            background-color: #1a253a;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        .navbar a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 15px;
+            background-color: var(--btn-bg);
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .navbar a:hover {
+            color: var(--text-white);
+            background-color: #2d3748;
         }
 
-        /* Desain Angka */
-        .number {
-            background-color: var(--bg-number);
+        /* Kontainer Konten Utama */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Judul dan Penjelasan Singkat */
+        .header-materi h1 {
             color: var(--text-blue);
-            font-size: 1rem;
-            font-weight: 800;
-            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .penjelasan-singkat {
+            background-color: var(--bg-card);
+            padding: 20px;
             border-radius: 8px;
-            min-width: 25px;
-            text-align: center;
-            margin-right: 15px;
-        }
-
-        /* Teks dalam Kartu */
-        .content h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .content p {
-            margin: 0;
-            font-size: 0.85rem;
+            border-left: 4px solid var(--text-blue);
+            margin-bottom: 30px;
             color: var(--text-gray);
         }
 
-        /* Tampilan Mobile (Responsive) */
-        @media (max-width: 768px) {
-            .roadmap-grid {
-                flex-direction: column;
-            }
-            .col-center {
-                display: none; /* Sembunyikan garis tengah di HP */
-            }
-            .col-left, .col-right {
-                padding: 0;
-            }
+        /* Area Tempat Menaruh Materi (Embed) */
+        .area-materi {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .area-materi h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 10px;
+        }
+        
+        /* Box untuk File PDF atau Video */
+        .embed-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Rasio 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Tombol Unduh Manual */
+        .btn-download {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: var(--text-blue);
+            color: #000;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* Navigasi Bawah (Next/Prev) */
+        .nav-bawah {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-bottom: 40px;
+        }
+        .nav-bawah a {
+            background-color: var(--btn-bg);
+            color: var(--text-white);
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Modul Pembelajaran Praktik</h1>
-        <p>Silakan klik modul di bawah ini sesuai urutan pembelajaran.</p>
-    </header>
+    <!-- Navigasi Kembali ke Peta -->
+    <div class="navbar">
+        <a href="index.html">← Kembali ke Peta Belajar</a>
+        <span>Materi Kelas XI</span>
+    </div>
 
-    <div class="roadmap-container">
-        <div class="roadmap-grid">
+    <div class="container">
+        <!-- Judul & Penjelasan -->
+        <div class="header-materi">
+            <h1>01. Dasar Fiber Optik</h1>
+        </div>
+
+        <div class="penjelasan-singkat">
+            <strong>Penjelasan Singkat:</strong><br>
+            Pada modul ini, kita akan mempelajari konsep dasar bagaimana cahaya dapat merambat melalui serat kaca. Kalian akan memahami perbedaan mendasar antara kabel Single Mode (SM) dan Multi Mode (MM), serta bagaimana struktur inti kabel (core, cladding, coating) bekerja untuk melindungi transmisi data.
+        </div>
+
+        <!-- Area Upload/Embed Materi -->
+        <div class="area-materi">
+            <h3>Buku Modul / Slide Presentasi</h3>
             
-            <!-- Sisi Kiri (Modul 01 - 04) -->
-            <div class="col-left">
-                <!-- Ganti "#" pada href dengan link materi Anda, misal: "materi/modul-01.html" -->
-                <a href="#" class="card">
-                    <div class="number">01</div>
-                    <div class="content">
-                        <h3>Dasar Fiber Optik</h3>
-                        <p>Struktur, cahaya, SM dan MM</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">02</div>
-                    <div class="content">
-                        <h3>Kabel & Konektor</h3>
-                        <p>Jenis, warna, ferrule dan identifikasi</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">03</div>
-                    <div class="content">
-                        <h3>Alat Kerja & K3</h3>
-                        <p>Stripper, cleaver, splicer dan APD</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">04</div>
-                    <div class="content">
-                        <h3>Fusion Splicing</h3>
-                        <p>Persiapan, penyambungan dan proteksi</p>
-                    </div>
-                </a>
+            <!-- Contoh Embed PDF dari Google Drive -->
+            <div class="embed-container">
+                <!-- Ganti link src di bawah dengan link embed Google Drive Anda -->
+                <iframe src="https://drive.google.com/file/d/CONTOH_ID_FILE_ANDA/preview" allow="autoplay"></iframe>
             </div>
 
-            <!-- Garis Tengah -->
-            <div class="col-center">
-                <div class="badge">LANJUT</div>
-            </div>
+            <!-- Tombol jika siswa ingin mendownload filenya -->
+            <a href="LINK_DOWNLOAD_FILE_ANDA" class="btn-download" target="_blank">Unduh Materi (PDF)</a>
+        </div>
 
-            <!-- Sisi Kanan (Modul 05 - 08) -->
-            <div class="col-right">
-                <a href="#" class="card">
-                    <div class="number">05</div>
-                    <div class="content">
-                        <h3>Perangkat Pasif</h3>
-                        <p>OTB, ODP, splitter dan cable dressing</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">06</div>
-                    <div class="content">
-                        <h3>Pengukuran Jaringan</h3>
-                        <p>VFL, OPM dan link loss budget</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">07</div>
-                    <div class="content">
-                        <h3>Analisis OTDR</h3>
-                        <p>Parameter, event dan titik putus</p>
-                    </div>
-                </a>
-
-                <a href="#" class="card">
-                    <div class="number">08</div>
-                    <div class="content">
-                        <h3>Troubleshooting</h3>
-                        <p>Diagnosis, pembersihan dan repair splice</p>
-                    </div>
-                </a>
-            </div>
-
+        <!-- Navigasi ke Modul Selanjutnya -->
+        <div class="nav-bawah">
+            <span style="visibility: hidden;">Kosong</span> <!-- Dikosongkan karena ini modul pertama -->
+            <a href="modul-02.html">Lanjut ke Modul 02 →</a>
         </div>
     </div>
 
