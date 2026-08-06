@@ -42,7 +42,6 @@
   ::selection{background:var(--jaringan);color:#001018;}
   :focus-visible{outline:2px solid var(--jaringan);outline-offset:2px;}
 
-  /* ---------- shell ---------- */
   .shell{max-width:1180px;margin:0 auto;padding:0 24px 80px;}
   header.topbar{
     display:flex;align-items:center;justify-content:space-between;
@@ -68,7 +67,6 @@
   h1,h2,h3{font-family:'Inter',sans-serif;margin:0;letter-spacing:-.01em;}
   .eyebrow{font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);}
 
-  /* ---------- dashboard hero ---------- */
   .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:40px;}
   .hero h1{font-size:32px;font-weight:800;max-width:560px;line-height:1.15;}
   .hero p{color:var(--text-muted);margin-top:10px;max-width:480px;font-size:14.5px;line-height:1.6;}
@@ -76,7 +74,6 @@
   .ring-wrap .num{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;}
   .ring-wrap .lbl{font-size:11.5px;color:var(--text-muted);line-height:1.4;max-width:110px;}
 
-  /* ---------- lanes (peta belajar) ---------- */
   .lane{margin-bottom:34px;}
   .lane-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
   .lane-title{display:flex;align-items:center;gap:10px;}
@@ -105,7 +102,6 @@
   .node-label{font-size:11.5px;text-align:center;color:var(--text-muted);line-height:1.35;}
   .node.done .node-label{color:var(--text);}
 
-  /* ---------- cards / materi ---------- */
   .cat-pills{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
   .pill{
     border:1px solid var(--border);background:var(--bg-elev);color:var(--text-muted);
@@ -120,10 +116,11 @@
     padding:18px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease;
   }
   .card:hover{border-color:var(--border);}
-  .card-top{display:flex;align-items:center;justify-content:space-between;}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;}
   .card-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--pc);border:1px solid var(--pc);padding:2px 8px;border-radius:6px;}
   .badge-done{font-size:10.5px;font-family:'Space Mono',monospace;color:var(--server);background:var(--server-dim);padding:2px 8px;border-radius:6px;}
   .badge-extra{font-size:10.5px;font-family:'Space Mono',monospace;color:var(--fiber);background:var(--fiber-dim);padding:2px 8px;border-radius:6px;}
+  .badge-file{font-size:10.5px;font-family:'Space Mono',monospace;color:var(--jaringan);background:var(--jaringan-dim);padding:2px 8px;border-radius:6px;}
   .card h4{font-size:15px;font-weight:700;line-height:1.35;}
   .card p{font-size:13px;color:var(--text-muted);line-height:1.55;margin:0;flex:1;}
   .card-actions{display:flex;gap:8px;margin-top:4px;}
@@ -139,10 +136,10 @@
   .btn.ghost{background:transparent;}
   .btn.block{width:100%;justify-content:center;}
   .btn.sm{padding:7px 11px;font-size:12.5px;}
+  .btn.disabled,.btn:disabled{opacity:.55;pointer-events:none;}
 
   .add-row{margin-top:4px;}
 
-  /* ---------- upload form ---------- */
   .panel{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:24px;}
   .panel h3{font-size:15.5px;margin-bottom:4px;}
   .panel .hint{font-size:12.5px;color:var(--text-muted);margin-bottom:16px;}
@@ -154,8 +151,8 @@
   }
   .field textarea{resize:vertical;min-height:70px;}
   .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--jaringan);}
+  .field .filehint{font-size:11.5px;color:var(--text-dim);margin-top:6px;}
 
-  /* ---------- modal ---------- */
   .overlay{position:fixed;inset:0;background:rgba(5,8,15,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
   .modal{background:var(--bg-elev);border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;padding:26px;max-height:85vh;overflow-y:auto;}
   .modal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px;}
@@ -164,9 +161,17 @@
   .modal h3{font-size:19px;margin-bottom:10px;}
   .modal p.desc{color:var(--text-muted);font-size:14px;line-height:1.65;margin-bottom:18px;}
   .modal .link-out{display:flex;align-items:center;gap:8px;color:var(--fiber);font-size:13.5px;font-weight:600;margin-bottom:18px;}
-  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
 
-  /* ---------- quiz ---------- */
+  .file-box{border:1px dashed var(--border);border-radius:11px;padding:14px 16px;margin-bottom:6px;}
+  .file-info{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;}
+  .file-info .fname{color:var(--text);font-weight:600;}
+  .file-info .fsize{color:var(--text-dim);font-size:11.5px;margin-left:6px;}
+  .file-empty{font-size:12.5px;color:var(--text-muted);margin-bottom:10px;}
+  label.file-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-elev-2);color:var(--text);padding:8px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  label.file-btn:hover{border-color:var(--text-dim);}
+  .uploading-txt{font-size:12.5px;color:var(--jaringan);}
+
   .quiz-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
   .qcard{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:12px;}
   .qcard .lane-icon{margin-bottom:2px;}
@@ -182,7 +187,7 @@
   .options{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
   .opt{
     text-align:left;background:var(--bg-elev);border:1px solid var(--border);border-radius:11px;
-    padding:13px 16px;font-size:14px;display:flex;align-items:center;gap:12px;color:var(--text);
+    padding:13px 16px;font-size:14px;display:flex;align-items:center;gap:12px;color:var(--text);width:100%;
   }
   .opt:hover{border-color:var(--text-dim);}
   .opt .k{font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);border:1px solid var(--border);width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -224,11 +229,11 @@
 <script>
 /* ===================== DATA ===================== */
 const CATS = {
-  jaringan:{name:'Jaringan', short:'Jaringan Kabel & Nirkabel', color:'var(--jaringan)', varname:'--jaringan', dim:'var(--jaringan-dim)',
+  jaringan:{name:'Jaringan', short:'Jaringan Kabel & Nirkabel', color:'var(--jaringan)', dim:'var(--jaringan-dim)',
     desc:'Dari alamat IP sampai VLAN', icon:iconNetwork},
-  fiber:{name:'Fiber Optik', short:'Fiber Optik', color:'var(--fiber)', varname:'--fiber', dim:'var(--fiber-dim)',
+  fiber:{name:'Fiber Optik', short:'Fiber Optik', color:'var(--fiber)', dim:'var(--fiber-dim)',
     desc:'Kabel kaca dari dasar sampai OTDR', icon:iconFiber},
-  server:{name:'Server', short:'Server', color:'var(--server)', varname:'--server', dim:'var(--server-dim)',
+  server:{name:'Server', short:'Server', color:'var(--server)', dim:'var(--server-dim)',
     desc:'Debian dari instalasi sampai website live', icon:iconServer}
 };
 
@@ -257,29 +262,103 @@ const MATERIALS = [
   {id:'s6',cat:'server',title:'Membuat Website',desc:'Menyiapkan berkas situs sederhana agar dapat diakses dari web server.'},
 ];
 
+/* ===================== QUIZ BANK (30 soal / kategori) ===================== */
 const QUIZ = {
   jaringan:[
-    {q:'Bagian mana dari alamat IP yang menentukan jaringan tempat perangkat berada?',opts:['Host ID','Network ID','MAC Address','Port Number'],a:1},
-    {q:'Notasi /26 pada CIDR menunjukkan berapa bit digunakan untuk network?',opts:['24 bit','25 bit','26 bit','30 bit'],a:2},
-    {q:'Perintah dasar apa yang umum dipakai untuk menguji koneksi antar host?',opts:['ping','format','delete','render'],a:0},
-    {q:'Mode keamanan wireless yang direkomendasikan untuk jaringan sekolah saat ini adalah?',opts:['WEP','Open','WPA2','Tanpa password'],a:2},
-    {q:'Fitur Mikrotik yang mengatur halaman login dan batas pemakaian pengguna disebut?',opts:['VLAN','Hotspot','Firewall NAT','DHCP Relay'],a:1},
-    {q:'VLAN digunakan terutama untuk apa dalam sebuah jaringan?',opts:['Menambah kecepatan internet','Memisahkan jaringan secara logis','Mengganti alamat MAC','Mematikan port switch'],a:1},
+    {q:'IPv4 terdiri dari berapa bit?',opts:['32 bit','24 bit','16 bit','64 bit'],a:0},
+    {q:'Format penulisan alamat IPv4 yang umum digunakan adalah?',opts:['Biner murni','Desimal bertitik','Heksadesimal','Oktal'],a:1},
+    {q:'Alamat IP kelas C secara default menggunakan subnet mask?',opts:['255.0.0.0','255.255.0.0','255.255.255.0','255.255.255.128'],a:2},
+    {q:'Alamat IP yang digunakan khusus untuk loopback adalah?',opts:['10.0.0.1','127.0.0.1','192.168.0.1','0.0.0.0'],a:1},
+    {q:'Rentang alamat IP privat kelas C yang umum dipakai adalah?',opts:['1.0.0.0–9.255.255.255','172.16.0.0–172.31.255.255','192.168.0.0–192.168.255.255','224.0.0.0–239.255.255.255'],a:2},
+    {q:'Notasi CIDR /28 berarti berapa bit digunakan untuk network?',opts:['24 bit','26 bit','28 bit','30 bit'],a:2},
+    {q:'Berapa jumlah host valid pada subnet /30?',opts:['2','4','6','8'],a:0},
+    {q:'VLSM (Variable Length Subnet Mask) digunakan untuk apa?',opts:['Membagi subnet dengan ukuran berbeda-beda','Mengganti default gateway','Menambah kecepatan wifi','Mengenkripsi data'],a:0},
+    {q:'Subnet mask 255.255.255.192 setara dengan notasi CIDR?',opts:['/24','/26','/28','/30'],a:1},
+    {q:'Alamat broadcast pada sebuah subnet digunakan untuk?',opts:['Mengirim data ke semua host di subnet tersebut','Menyimpan alamat gateway','Login ke router','Menyimpan alamat MAC'],a:0},
+    {q:'Perintah yang umum dipakai untuk menguji koneksi antar host adalah?',opts:['ping','format','delete','install'],a:0},
+    {q:'Default gateway berfungsi sebagai?',opts:['Jalur keluar menuju jaringan lain','Nama komputer','Alamat MAC','Server DNS'],a:0},
+    {q:'Fungsi utama DNS dalam jaringan adalah?',opts:['Menerjemahkan nama domain ke alamat IP','Membagi bandwidth','Mengatur VLAN','Menyimpan password wifi'],a:0},
+    {q:'DHCP digunakan untuk apa?',opts:['Memberikan alamat IP secara otomatis ke perangkat','Mengatur kecepatan CPU','Menghapus cache browser','Mengunci port switch'],a:0},
+    {q:'Kabel yang umum digunakan untuk menghubungkan PC ke switch adalah?',opts:['UTP straight-through','UTP cross saja','Fiber single mode','Kabel coaxial'],a:0},
+    {q:'SSID adalah?',opts:['Nama jaringan wireless yang terlihat oleh pengguna','Alamat MAC access point','Kata sandi wifi','Kode enkripsi data'],a:0},
+    {q:'Mode keamanan wireless yang umum direkomendasikan adalah?',opts:['WEP','Tanpa password (open)','WPA2','Hidden SSID saja'],a:2},
+    {q:'Access point berfungsi untuk?',opts:['Menghubungkan perangkat nirkabel ke jaringan kabel','Memotong kabel fiber','Mengatur VLAN saja','Menyimpan halaman login hotspot'],a:0},
+    {q:'Interferensi sinyal wireless sering disebabkan oleh?',opts:['Perangkat elektronik lain & channel yang tumpang tindih','Kabel UTP yang panjang','VLAN ID yang salah','Warna casing router'],a:0},
+    {q:'Frekuensi yang umum digunakan wireless rumahan/sekolah adalah?',opts:['2.4GHz dan 5GHz','56kHz','100MHz','1GHz'],a:0},
+    {q:'Fitur Hotspot pada Mikrotik memungkinkan pengguna untuk?',opts:['Login melalui halaman web sebelum akses internet','Langsung akses tanpa autentikasi','Mengubah firmware router','Membuat VLAN otomatis'],a:0},
+    {q:'User profile pada hotspot digunakan untuk mengatur?',opts:['Batas kecepatan dan durasi akses tiap pengguna','Warna tampilan router','Jumlah port switch','Alamat MAC address'],a:0},
+    {q:'Halaman yang muncul saat pengguna pertama kali terhubung ke hotspot disebut?',opts:['Login page','Firewall rule','DNS cache','VLAN tag'],a:0},
+    {q:'Salah satu tujuan penggunaan hotspot login di sekolah adalah?',opts:['Mengontrol siapa saja yang dapat mengakses internet','Mematikan semua wifi','Menghapus konfigurasi VLAN','Mengganti kabel fiber'],a:0},
+    {q:'Walled garden pada hotspot berfungsi untuk?',opts:['Mengizinkan akses ke situs tertentu tanpa login','Memblokir semua akses','Menghapus user profile','Mengatur kecepatan CPU'],a:0},
+    {q:'VLAN digunakan untuk?',opts:['Memisahkan jaringan secara logis dalam satu perangkat fisik','Mempercepat koneksi internet','Mengganti kabel UTP jadi fiber','Menghapus alamat IP'],a:0},
+    {q:'Trunk port pada VLAN berfungsi untuk?',opts:['Membawa banyak VLAN sekaligus antar switch','Hanya membawa satu VLAN','Memutus koneksi VLAN','Menyimpan password wifi'],a:0},
+    {q:'Access port pada VLAN biasanya dihubungkan ke?',opts:['Perangkat end-user seperti PC','Switch lain saja','Router inti','Access point saja'],a:0},
+    {q:'Agar dua VLAN berbeda dapat saling berkomunikasi diperlukan?',opts:['Inter-VLAN routing','Access port tambahan','Kabel fiber','Hotspot login'],a:0},
+    {q:'VLAN ID memiliki rentang nilai standar dari?',opts:['1–4094','1–100','0–10','1–65535'],a:0},
   ],
   fiber:[
-    {q:'Jenis kabel fiber yang cocok untuk jarak jauh dengan redaman rendah adalah?',opts:['Multi Mode','Single Mode','Coaxial','UTP'],a:1},
-    {q:'Alat yang digunakan untuk memotong ujung serat kaca secara presisi disebut?',opts:['Stripper','Cleaver','OPM','ODP'],a:1},
-    {q:'Proses menyambung dua serat optik menggunakan panas listrik disebut?',opts:['Crimping','Fusion Splicing','Terminasi RJ45','Patching'],a:1},
-    {q:'Perangkat pasif yang membagi satu jalur sinyal optik menjadi beberapa jalur disebut?',opts:['Splitter','Router','Switch','Repeater'],a:0},
-    {q:'Alat ukur yang digunakan untuk membaca redaman jalur fiber (link loss) adalah?',opts:['OTDR','OPM','VFL','Cleaver'],a:1},
-    {q:'OTDR paling berguna untuk menemukan apa pada jalur fiber?',opts:['Kecepatan internet','Titik putus atau gangguan','Warna kabel','Jumlah splitter yang terpasang'],a:1},
+    {q:'Media transmisi fiber optik menggunakan apa untuk mengirim data?',opts:['Cahaya','Listrik','Gelombang radio','Suara'],a:0},
+    {q:'Kabel single mode cocok digunakan untuk jarak?',opts:['Jauh dengan redaman rendah','Sangat dekat saja','Tidak bisa dipakai di luar ruangan','Hanya untuk indoor kecil'],a:0},
+    {q:'Kabel multi mode umumnya digunakan untuk jarak?',opts:['Pendek dalam gedung','Ratusan kilometer','Antar kota','Bawah laut'],a:0},
+    {q:'Inti (core) fiber optik terbuat dari bahan?',opts:['Kaca atau plastik','Tembaga','Alumunium','Karet'],a:0},
+    {q:'Warna umum untuk konektor single mode APC adalah?',opts:['Hijau','Biru','Hitam','Merah'],a:0},
+    {q:'Ferrule pada konektor fiber berfungsi untuk?',opts:['Menjaga posisi inti serat tetap presisi','Memotong kabel','Menyambung listrik','Melindungi dari air saja'],a:0},
+    {q:'Konektor SC memiliki mekanisme kunci berbentuk?',opts:['Push-pull','Berulir','Bayonet','Snap magnet'],a:0},
+    {q:'Konektor fiber yang berbentuk kecil dan berulir dikenal dengan nama?',opts:['FC','SC','LC','ST'],a:0},
+    {q:'Fungsi utama fiber stripper adalah?',opts:['Mengupas lapisan pelindung kabel fiber','Memotong ujung serat kaca secara presisi','Mengukur redaman','Menyambung serat dengan panas'],a:0},
+    {q:'Alat pelindung diri yang wajib digunakan saat bekerja dengan serat kaca adalah?',opts:['Kacamata pelindung','Sarung tangan tebal saja','Helm proyek','Masker las'],a:0},
+    {q:'Serpihan sisa pemotongan serat optik berbahaya karena dapat?',opts:['Menusuk kulit dan sulit terlihat','Menyebabkan korsleting listrik','Membuat karat','Menghasilkan asap beracun'],a:0},
+    {q:'Cleaver pada pekerjaan fiber optik digunakan untuk?',opts:['Memotong ujung serat secara presisi','Mengupas kabel luar','Mengukur loss jaringan','Menyalakan indikator laser'],a:0},
+    {q:'Fusion splicer menyambung dua serat optik menggunakan?',opts:['Panas dari busur listrik','Lem khusus','Selotip listrik','Tekanan mekanis saja'],a:0},
+    {q:'Sebelum disambung, kedua ujung serat optik harus dalam keadaan?',opts:['Bersih dan terpotong rata','Basah oleh alkohol','Dibengkokkan','Dipanaskan dahulu'],a:0},
+    {q:'Setelah proses fusion splicing, sambungan perlu dilindungi menggunakan?',opts:['Protection sleeve','Selotip biasa','Lem super','Tidak perlu dilindungi'],a:0},
+    {q:'Hasil sambungan fusion splicing yang baik ditandai dengan nilai redaman yang?',opts:['Sangat rendah','Sangat tinggi','Tidak terukur','Selalu nol mutlak'],a:0},
+    {q:'OTB (Optical Termination Box) berfungsi sebagai?',opts:['Titik terminasi dan pelindung sambungan kabel fiber','Alat ukur redaman','Alat pemotong serat','Sumber cahaya laser'],a:0},
+    {q:'ODP (Optical Distribution Point) digunakan untuk?',opts:['Mendistribusikan jalur fiber ke beberapa pelanggan','Mengukur kecepatan internet','Menyimpan konfigurasi router','Memancarkan sinyal wireless'],a:0},
+    {q:'Splitter pada jaringan fiber optik berfungsi untuk?',opts:['Membagi satu sinyal optik menjadi beberapa jalur','Menguatkan sinyal listrik','Mengubah cahaya menjadi suara','Menyaring air pada kabel'],a:0},
+    {q:'Cable dressing yang rapi pada ODP bertujuan untuk?',opts:['Memudahkan perawatan dan mengurangi risiko kerusakan','Mempercantik ruangan saja','Mengurangi tagihan listrik','Mempercepat sinyal wifi'],a:0},
+    {q:'VFL (Visual Fault Locator) digunakan untuk?',opts:['Menemukan titik putus dengan cahaya tampak','Mengukur kecepatan data','Menyambung serat optik','Memotong kabel'],a:0},
+    {q:'OPM (Optical Power Meter) berfungsi untuk mengukur?',opts:['Daya sinyal optik yang diterima','Suhu ruangan','Panjang kabel fiber','Tegangan listrik'],a:0},
+    {q:'Link loss budget dihitung untuk memastikan?',opts:['Redaman total jalur masih dalam batas toleransi perangkat','Kecepatan CPU router mencukupi','VLAN terpasang dengan benar','SSID tidak bentrok'],a:0},
+    {q:'Satuan yang umum digunakan untuk mengukur redaman pada fiber optik adalah?',opts:['dB (desibel)','Watt','Ampere','Hertz'],a:0},
+    {q:'OTDR bekerja dengan cara mengirimkan?',opts:['Pulsa cahaya dan menganalisis pantulannya','Sinyal listrik AC','Gelombang radio','Suara ultrasonik'],a:0},
+    {q:'Event pada hasil pembacaan OTDR biasanya menunjukkan?',opts:['Titik sambungan, konektor, atau gangguan pada jalur','Kecepatan internet pelanggan','Jumlah pelanggan aktif','Warna kabel yang terpasang'],a:0},
+    {q:'Titik putus pada jalur fiber terlihat pada grafik OTDR sebagai?',opts:['Penurunan sinyal secara drastis','Garis lurus tanpa perubahan','Peningkatan sinyal tiba-tiba','Warna merah pada kabel'],a:0},
+    {q:'Langkah awal troubleshooting redaman tinggi pada fiber adalah?',opts:['Memeriksa kebersihan konektor','Langsung mengganti seluruh kabel','Mematikan seluruh jaringan','Mengganti splitter tanpa pengecekan'],a:0},
+    {q:'Penyebab umum gangguan pada jaringan fiber optik adalah?',opts:['Konektor kotor atau kabel tertekuk tajam','Alamat IP salah','VLAN tidak sesuai','SSID tersembunyi'],a:0},
+    {q:'Perbaikan sambungan yang rusak pada fiber optik biasanya dilakukan dengan?',opts:['Melakukan ulang fusion splicing','Mengganti alamat IP','Restart router','Mengatur ulang VLAN'],a:0},
   ],
   server:[
-    {q:'Sebelum menginstal software tambahan di Debian, sumber paket yang perlu diatur adalah?',opts:['DNS','Repositori','Firewall','Hostname'],a:1},
-    {q:'IP Static pada server bertujuan agar alamat IP server tetap dan tidak?',opts:['Berubah-ubah','Terhubung ke internet','Memiliki subnet mask','Bisa diakses SSH'],a:0},
-    {q:'Protokol yang digunakan untuk mengakses server dari jarak jauh secara aman melalui terminal adalah?',opts:['FTP','HTTP','SSH','SNMP'],a:2},
-    {q:'Layanan yang perlu dipasang di Debian agar server bisa menyajikan halaman website adalah?',opts:['Web server','DHCP server','Print server','NTP server'],a:0},
-    {q:'Berkas utama sebuah website sederhana biasanya diletakkan di direktori web server yang bernama?',opts:['/etc','/var/www','/home','/tmp'],a:1},
+    {q:'Debian adalah salah satu jenis?',opts:['Sistem operasi berbasis Linux','Aplikasi office','Bahasa pemrograman','Perangkat keras jaringan'],a:0},
+    {q:'Saat instalasi Debian, partisi yang menyimpan sistem utama biasanya diberi label?',opts:['root (/)','C: drive','Data (D:)','Swap saja'],a:0},
+    {q:'Mode instalasi Debian tanpa tampilan grafis disebut?',opts:['Text mode','GUI mode','Safe mode','Recovery mode'],a:0},
+    {q:'Partisi swap pada instalasi Debian berfungsi sebagai?',opts:['Memori tambahan virtual','Penyimpanan cadangan file user','Tempat instalasi aplikasi','Partisi boot utama'],a:0},
+    {q:'Setelah instalasi selesai, langkah pertama yang umum dilakukan pada server adalah?',opts:['Update dan upgrade sistem','Mematikan server permanen','Menghapus semua partisi','Mengganti nama domain'],a:0},
+    {q:'IP Static digunakan pada server agar alamat IP?',opts:['Tetap dan tidak berubah','Berubah setiap restart','Otomatis dari DHCP','Selalu diacak sistem'],a:0},
+    {q:'File konfigurasi jaringan pada Debian umumnya terletak di?',opts:['/etc/network/interfaces','/home/user/network/','/var/log/network/','/boot/network.conf'],a:0},
+    {q:'Setelah mengubah konfigurasi IP, layanan yang perlu direstart adalah?',opts:['Layanan networking','Layanan SSH saja','Layanan web server saja','Tidak perlu restart apapun'],a:0},
+    {q:'Gateway pada konfigurasi IP static berfungsi sebagai?',opts:['Jalur keluar menuju jaringan lain','Alamat DNS utama','Nama domain server','Port akses SSH'],a:0},
+    {q:'Kesalahan umum saat setting IP static adalah?',opts:['Subnet mask tidak sesuai dengan jaringan','Nama server terlalu panjang','Warna terminal salah','Ukuran partisi kurang'],a:0},
+    {q:'Repositori Debian berisi kumpulan?',opts:['Paket software yang dapat diinstal','Alamat IP client','Daftar VLAN','Rekaman log server'],a:0},
+    {q:'File yang digunakan untuk mengatur sumber repositori Debian adalah?',opts:['/etc/apt/sources.list','/etc/hosts','/etc/passwd','/etc/network/repo'],a:0},
+    {q:'Perintah untuk memperbarui daftar paket dari repositori adalah?',opts:['apt update','apt install saja','apt remove','apt clean'],a:0},
+    {q:'Repositori lokal biasanya digunakan di sekolah untuk?',opts:['Mempercepat instalasi tanpa koneksi internet penuh','Memperlambat jaringan','Mengganti alamat IP','Menghapus VLAN'],a:0},
+    {q:'Jika repositori salah dikonfigurasi, dampaknya adalah?',opts:['Paket software gagal diunduh atau diinstal','Server otomatis mati','VLAN hilang','Alamat IP berubah sendiri'],a:0},
+    {q:'SSH digunakan untuk?',opts:['Mengakses server dari jarak jauh secara aman','Menghubungkan kabel fiber','Mengatur SSID wifi','Membagi VLAN'],a:0},
+    {q:'Port default yang digunakan layanan SSH adalah?',opts:['22','80','443','21'],a:0},
+    {q:'Untuk keamanan tambahan, login SSH sebagai root sebaiknya?',opts:['Dinonaktifkan dan menggunakan user biasa','Selalu diaktifkan tanpa password','Dibagikan ke semua orang','Tidak perlu diatur'],a:0},
+    {q:'Paket yang perlu diinstal agar Debian dapat diakses via SSH adalah?',opts:['openssh-server','apache2','bind9','samba'],a:0},
+    {q:'Autentikasi SSH yang lebih aman dibanding password adalah?',opts:['Menggunakan key pair (public-private key)','Menggunakan nama server saja','Menonaktifkan firewall','Membuka semua port'],a:0},
+    {q:'Salah satu aplikasi web server populer di Debian adalah?',opts:['Apache2','Photoshop','Microsoft Word','VLC Media Player'],a:0},
+    {q:'Port default yang digunakan layanan web server HTTP adalah?',opts:['80','22','25','53'],a:0},
+    {q:'Agar layanan web server otomatis berjalan tiap server dinyalakan, perlu diaktifkan melalui?',opts:['systemctl enable','systemctl delete','apt remove','rm -rf'],a:0},
+    {q:'Status sebuah layanan web server dapat diperiksa dengan perintah?',opts:['systemctl status','apt update','ping localhost','ls -la'],a:0},
+    {q:'Firewall pada server perlu diatur agar?',opts:['Port web server tetap dapat diakses dari luar','Semua port tertutup total','Server otomatis restart','VLAN otomatis terbentuk'],a:0},
+    {q:'Berkas utama halaman website biasanya bernama?',opts:['index.html','readme.txt','config.php saja','data.csv'],a:0},
+    {q:'Direktori default penyimpanan berkas website pada Apache di Debian adalah?',opts:['/var/www/html','/etc/www/','/home/website/','/usr/local/site/'],a:0},
+    {q:'Agar website dapat diakses menggunakan nama domain lokal, dapat dikonfigurasi melalui?',opts:['File hosts atau DNS server','Warna latar halaman','Ukuran font','Jenis kabel'],a:0},
+    {q:'Setelah menambahkan file website baru, agar dapat diakses biasanya perlu?',opts:['Memastikan permission dan menempatkannya di direktori web server','Merestart seluruh server','Mengganti IP address','Menghapus repositori'],a:0},
+    {q:'Bahasa dasar yang digunakan untuk membangun struktur halaman website adalah?',opts:['HTML','Python saja','SQL','Assembly'],a:0},
   ]
 };
 
@@ -292,40 +371,31 @@ function iconServer(c){return `<svg width="16" height="16" viewBox="0 0 24 24" f
 let state = {
   view:'dashboard',
   materiCat:'jaringan',
-  extra:[],       // uploaded materials (shared)
-  progress:{},    // personal completed nodes
-  scores:{},      // personal quiz scores
+  extra:[],
+  progress:{},
+  scores:{},
+  filesIndex:{},
   modalNode:null,
   quizCat:null,
   quizIdx:0,
   quizAnswers:[],
   quizPicked:null,
   showUploadForm:false,
+  uploadingId:null,
 };
 
+const MAX_FILE_BYTES = 3.5 * 1024 * 1024;
+
 async function loadStorage(){
-  try{
-    const ex = await window.storage.get('materi-tambahan', true);
-    state.extra = ex ? JSON.parse(ex.value) : [];
-  }catch(e){ state.extra = []; }
-  try{
-    const pr = await window.storage.get('progress', false);
-    state.progress = pr ? JSON.parse(pr.value) : {};
-  }catch(e){ state.progress = {}; }
-  try{
-    const sc = await window.storage.get('quiz-scores', false);
-    state.scores = sc ? JSON.parse(sc.value) : {};
-  }catch(e){ state.scores = {}; }
+  try{ const ex = await window.storage.get('materi-tambahan', true); state.extra = ex ? JSON.parse(ex.value) : []; }catch(e){ state.extra = []; }
+  try{ const pr = await window.storage.get('progress', false); state.progress = pr ? JSON.parse(pr.value) : {}; }catch(e){ state.progress = {}; }
+  try{ const sc = await window.storage.get('quiz-scores', false); state.scores = sc ? JSON.parse(sc.value) : {}; }catch(e){ state.scores = {}; }
+  try{ const fi = await window.storage.get('materi-files-index', true); state.filesIndex = fi ? JSON.parse(fi.value) : {}; }catch(e){ state.filesIndex = {}; }
 }
-async function saveExtra(){
-  try{ await window.storage.set('materi-tambahan', JSON.stringify(state.extra), true); }catch(e){}
-}
-async function saveProgress(){
-  try{ await window.storage.set('progress', JSON.stringify(state.progress), false); }catch(e){}
-}
-async function saveScores(){
-  try{ await window.storage.set('quiz-scores', JSON.stringify(state.scores), false); }catch(e){}
-}
+async function saveExtra(){ try{ await window.storage.set('materi-tambahan', JSON.stringify(state.extra), true); }catch(e){} }
+async function saveProgress(){ try{ await window.storage.set('progress', JSON.stringify(state.progress), false); }catch(e){} }
+async function saveScores(){ try{ await window.storage.set('quiz-scores', JSON.stringify(state.scores), false); }catch(e){} }
+async function saveFilesIndex(){ try{ await window.storage.set('materi-files-index', JSON.stringify(state.filesIndex), true); }catch(e){} }
 
 function allMaterials(){ return MATERIALS.concat(state.extra); }
 function materialsByCat(cat){ return allMaterials().filter(m=>m.cat===cat); }
@@ -340,6 +410,60 @@ function overallProgress(){
   if(!items.length) return 0;
   const done = items.filter(m=>state.progress[m.id]).length;
   return Math.round(done/items.length*100);
+}
+function fmtSize(bytes){
+  if(!bytes) return '';
+  if(bytes < 1024*1024) return Math.round(bytes/1024)+' KB';
+  return (bytes/(1024*1024)).toFixed(1)+' MB';
+}
+
+/* ===================== FILE UPLOAD (PPT/PDF) ===================== */
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = ()=>reject(new Error('read failed'));
+    r.readAsDataURL(file);
+  });
+}
+async function attachFile(id, file){
+  if(!file) return false;
+  if(file.size > MAX_FILE_BYTES){
+    alert('Ukuran file terlalu besar. Maksimal sekitar 3.5MB per file (PPT/PDF).');
+    return false;
+  }
+  try{
+    const dataUrl = await fileToDataUrl(file);
+    await window.storage.set('materi-file:'+id, JSON.stringify({name:file.name,type:file.type,dataUrl}), true);
+    state.filesIndex[id] = {name:file.name,type:file.type,size:file.size};
+    await saveFilesIndex();
+    return true;
+  }catch(e){
+    alert('Gagal mengunggah file. Coba file yang lebih kecil atau format PDF/PPT/PPTX.');
+    return false;
+  }
+}
+async function onModalFileChange(event, id){
+  const file = event.target.files[0];
+  if(!file) return;
+  state.uploadingId = id;
+  render();
+  await attachFile(id, file);
+  state.uploadingId = null;
+  render();
+}
+async function downloadFile(id){
+  try{
+    const res = await window.storage.get('materi-file:'+id, true);
+    if(!res){ alert('File tidak ditemukan.'); return; }
+    const data = JSON.parse(res.value);
+    const a = document.createElement('a');
+    a.href = data.dataUrl;
+    a.download = data.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }catch(e){ alert('Gagal mengunduh file.'); }
 }
 
 /* ===================== RENDER: NAV ===================== */
@@ -433,11 +557,15 @@ function renderMateri(){
 function renderCard(m,i,cat){
   const done = !!state.progress[m.id];
   const isExtra = m.id.startsWith('x');
+  const hasFile = !!state.filesIndex[m.id];
   return `
   <div class="card" style="--pc:${cat.color}">
     <div class="card-top">
       <span class="card-num">${isExtra? '＋' : String(i+1).padStart(2,'0')}</span>
-      ${done? '<span class="badge-done">Selesai</span>' : (isExtra? '<span class="badge-extra">Tambahan</span>' : '')}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+        ${hasFile? '<span class="badge-file">📎 File</span>' : ''}
+        ${done? '<span class="badge-done">Selesai</span>' : (isExtra? '<span class="badge-extra">Tambahan</span>' : '')}
+      </div>
     </div>
     <h4>${escapeHtml(m.title)}</h4>
     <p>${escapeHtml(m.desc||'')}</p>
@@ -451,7 +579,7 @@ function renderUploadForm(){
   return `
   <div class="panel">
     <h3>Tambah Materi</h3>
-    <div class="hint">Materi tambahan akan tampil untuk semua pengguna di kategori yang dipilih.</div>
+    <div class="hint">Materi tambahan akan tampil untuk semua pengguna di kategori yang dipilih. Kamu juga bisa langsung melampirkan file PPT/PDF.</div>
     <div class="field">
       <label>Kategori</label>
       <select id="up-cat">
@@ -470,7 +598,12 @@ function renderUploadForm(){
       <label>Tautan Materi (opsional)</label>
       <input id="up-link" type="text" placeholder="https://...">
     </div>
-    <button class="btn primary" onclick="submitUpload()">Simpan Materi</button>
+    <div class="field">
+      <label>Lampiran PPT/PDF (opsional)</label>
+      <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+      <div class="filehint">Maksimal sekitar 3.5MB per file.</div>
+    </div>
+    <button class="btn primary" id="up-submit-btn" onclick="submitUpload()">Simpan Materi</button>
   </div>`;
 }
 
@@ -482,10 +615,19 @@ async function submitUpload(){
   const title = document.getElementById('up-title').value.trim();
   const desc = document.getElementById('up-desc').value.trim();
   const link = document.getElementById('up-link').value.trim();
+  const fileInput = document.getElementById('up-file');
+  const file = fileInput.files[0];
   if(!title){ alert('Judul materi wajib diisi.'); return; }
+  if(file && file.size > MAX_FILE_BYTES){
+    alert('Ukuran file terlalu besar. Maksimal sekitar 3.5MB per file (PPT/PDF).');
+    return;
+  }
+  const btn = document.getElementById('up-submit-btn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Menyimpan...'; }
   const id = 'x' + Date.now();
   state.extra.push({id,cat,title,desc,link: link||undefined});
   await saveExtra();
+  if(file){ await attachFile(id, file); }
   state.showUploadForm=false;
   state.materiCat=cat;
   render();
@@ -500,6 +642,8 @@ function renderModal(){
   if(!m) return '';
   const cat = CATS[m.cat];
   const done = !!state.progress[m.id];
+  const fileInfo = state.filesIndex[m.id];
+  const isUploading = state.uploadingId===m.id;
   return `
   <div class="overlay" onclick="if(event.target===this) closeModal()">
     <div class="modal">
@@ -510,6 +654,28 @@ function renderModal(){
       <h3>${escapeHtml(m.title)}</h3>
       <p class="desc">${escapeHtml(m.desc||'Belum ada deskripsi untuk materi ini.')}</p>
       ${m.link? `<a class="link-out" href="${escapeAttr(m.link)}" target="_blank" rel="noopener">Buka Modul ↗</a>` : ''}
+
+      <div class="file-box">
+        ${fileInfo? `
+          <div class="file-info">
+            <span><span class="fname">📎 ${escapeHtml(fileInfo.name)}</span><span class="fsize">${fmtSize(fileInfo.size)}</span></span>
+            <button class="btn sm" onclick="downloadFile('${m.id}')">Unduh</button>
+          </div>
+          <div style="margin-top:10px;">
+            ${isUploading? `<span class="uploading-txt">Mengunggah file baru…</span>` : `
+            <label class="file-btn">Ganti File
+              <input type="file" accept=".pdf,.ppt,.pptx" style="display:none" onchange="onModalFileChange(event,'${m.id}')">
+            </label>`}
+          </div>
+        ` : `
+          <div class="file-empty">Belum ada lampiran PPT/PDF untuk materi ini.</div>
+          ${isUploading? `<span class="uploading-txt">Mengunggah file…</span>` : `
+          <label class="file-btn">Unggah PPT/PDF
+            <input type="file" accept=".pdf,.ppt,.pptx" style="display:none" onchange="onModalFileChange(event,'${m.id}')">
+          </label>`}
+        `}
+      </div>
+
       <div class="modal-actions">
         <button class="btn ${done?'':'primary'}" style="--pc:${cat.color}" onclick="toggleDone('${m.id}')">
           ${done? '✓ Sudah selesai — tandai ulang' : 'Tandai Selesai'}
