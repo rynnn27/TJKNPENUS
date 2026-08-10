@@ -372,6 +372,8 @@ function iconServer(c){return `<svg width="16" height="16" viewBox="0 0 24 24" f
 /* ===================== GOOGLE SHEETS BACKEND ===================== */
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxO4cr45fj-yuKDhl_8q1ZDp2oSLdVAp9Iwyn-RxyhONOuQ5SeYkJUMytw4Ld1LWpjBxg/exec';
 let adminMode = sessionStorage.getItem('tjkn_admin_mode') === '1';
+const ADMIN_UI_PASSWORD = 'Riyan123';
+const ADMIN_BACKEND_PASSWORD = 'ADMIN';
 let adminPassword = sessionStorage.getItem('tjkn_admin_password') || '';
 
 async function apiRequest(action,payload={}){
@@ -389,13 +391,15 @@ async function syncOnlineData(){
 async function enterAdminMode(){
   const p=window.prompt('Password Admin:');
   if(p===null)return;
+  if(p!==ADMIN_UI_PASSWORD){alert('Password admin salah.');return;}
   try{
-    const d=await apiRequest('checkAdmin',{password:p});
-    if(!d.ok)throw new Error('Password salah');
-    adminPassword=p; adminMode=true;
-    sessionStorage.setItem('tjkn_admin_mode','1'); sessionStorage.setItem('tjkn_admin_password',p);
+    // Backend lama Anda masih memakai password ADMIN. UI tetap memakai Riyan123.
+    const d=await apiRequest('checkAdmin',{password:ADMIN_BACKEND_PASSWORD});
+    if(!d.ok)throw new Error('Backend admin belum aktif');
+    adminPassword=ADMIN_BACKEND_PASSWORD; adminMode=true;
+    sessionStorage.setItem('tjkn_admin_mode','1'); sessionStorage.setItem('tjkn_admin_password',ADMIN_BACKEND_PASSWORD);
     render();
-  }catch(e){alert('Akses admin ditolak.');}
+  }catch(e){alert('Akses admin ditolak. Pastikan deployment Apps Script sudah aktif.');}
 }
 function exitAdminMode(){
   adminMode=false; adminPassword='';
