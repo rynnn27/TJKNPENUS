@@ -221,7 +221,7 @@
       <div class="dot-strand"><span></span><span></span><span></span></div>
       <div class="brand-text">TJKN.io<small>Teknologi Jaringan Kabel &amp; Nirkabel</small></div>
     </div>
-    <nav class="tabs" id="mainNav"></nav>
+    <nav class="tabs" id="mainNav"></nav><div id="studentBadge"></div>
   </header>
   <main id="app"></main>
   <footer>SMK PLUS PELITA NUSANTARA — TKJ · KURIKULUM MERDEKA</footer>
@@ -368,8 +368,53 @@ function iconNetwork(c){return `<svg width="16" height="16" viewBox="0 0 24 24" 
 function iconFiber(c){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12c3-5 6 5 9 0s6-5 9 0" stroke="${c}" stroke-width="1.7" stroke-linecap="round"/><circle cx="3" cy="12" r="1.6" fill="${c}"/><circle cx="21" cy="12" r="1.6" fill="${c}"/></svg>`;}
 function iconServer(c){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="6" rx="1.4" stroke="${c}" stroke-width="1.6"/><rect x="4" y="14" width="16" height="6" rx="1.4" stroke="${c}" stroke-width="1.6"/><circle cx="7.3" cy="7" r="1" fill="${c}"/><circle cx="7.3" cy="17" r="1" fill="${c}"/></svg>`;}
 
+
 /* ===================== GOOGLE SHEETS BACKEND ===================== */
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxO4cr45fj-yuKDhl_8q1ZDp2oSLdVAp9Iwyn-RxyhONOuQ5SeYkJUMytw4Ld1LWpjBxg/exec';
+let currentUser=JSON.parse(localStorage.getItem('tjkn_current_user')||'null');
+
+async function apiRequest(action,payload={}){
+  if(!GOOGLE_SCRIPT_URL||GOOGLE_SCRIPT_URL.includes('PASTE_GOOGLE_APPS_SCRIPT'))
+    throw new Error('Google Apps Script URL belum diatur.');
+  const r=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});
+  const d=await r.json(); if(!d.ok)throw new Error(d.error||'API error'); return d;
+}
+async function loginStudent(name,kelas){
+  if(!name.trim()||!kelas.trim())throw new Error('Nama dan kelas wajib diisi.');
+  const d=await apiRequest('login',{name:name.trim(),kelas:kelas.trim()});
+  currentUser=d.user;localStorage.setItem('tjkn_current_user',JSON.stringify(currentUser));return currentUser;
+}
+function logoutStudent(){currentUser=null;localStorage.removeItem('tjkn_current_user');render();}
+async function syncStudentData(){
+  if(!currentUser)return;
+  try{const d=await apiRequest('getStudentData',{studentId:currentUser.id});state.progress=d.progress||{};state.scores=d.scores||{};}catch(e){console.warn(e);}
+}
+async function saveStudentProgress(id,status){
+  if(!currentUser)return;
+  try{await apiRequest('saveProgress',{studentId:currentUser.id,name:currentUser.name,kelas:currentUser.kelas,materialId:id,status});}
+  catch(e){alert('Progress gagal disimpan. Periksa URL Apps Script.');}
+}
+async function saveStudentScore(cat,correct,total){
+  if(!currentUser)return;
+  try{await apiRequest('saveQuiz',{studentId:currentUser.id,name:currentUser.name,kelas:currentUser.kelas,category:cat,correct,total,score:Math.round(correct/total*100)});}
+  catch(e){alert('Nilai gagal disimpan. Periksa URL Apps Script.');}
+}
+function renderLogin(){return `<div class="panel" style="max-width:520px;margin:70px auto;">
+<div class="eyebrow">TJKN.io · Akses Siswa</div><h1 style="font-size:28px;margin-top:5px;">Masuk ke Peta Belajar</h1>
+<p class="hint">Nama dan kelas digunakan untuk menyimpan progress serta nilai kuis.</p>
+<div class="field"><label>Nama Siswa</label><input id="login-name" type="text" placeholder="Contoh: Riyan Syahrul"></div>
+<div class="field"><label>Kelas</label><input id="login-class" type="text" placeholder="Contoh: XII TKJ 1"></div>
+<button class="btn primary block" onclick="doLogin()">Masuk & Mulai Belajar</button>
+<div id="login-status" style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center;"></div></div>`;}
+async function doLogin(){
+  const s=document.getElementById('login-status');s.textContent='Menghubungkan ke Google Sheets...';
+  try{await loginStudent(document.getElementById('login-name').value,document.getElementById('login-class').value);await syncStudentData();render();}catch(e){s.textContent=e.message;}
+}
+function studentBadge(){return currentUser?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="badge-done">👤 ${escapeHtml(currentUser.name)} · ${escapeHtml(currentUser.kelas)}</span><button class="btn sm ghost" onclick="logoutStudent()">Keluar</button></div>`:'';}
+function renderStudentDashboard(){
+  const scores=Object.keys(state.scores).map(k=>{const s=state.scores[k],c=CATS[k];return `<div class="card" style="--pc:${c.color}"><div class="card-top"><span class="card-num">${c.name}</span><span class="badge-done">${Math.round(s.correct/s.total*100)}%</span></div><h4>${s.correct}/${s.total} benar</h4><p>Terakhir: ${new Date(s.date||Date.now()).toLocaleString('id-ID')}</p></div>`;}).join('');
+  return `<div class="panel"><div class="eyebrow">Dashboard Siswa</div><h2 style="margin-top:4px;">Halo, ${escapeHtml(currentUser.name)} 👋</h2><p class="hint">Kelas ${escapeHtml(currentUser.kelas)} · data tersinkron ke Google Sheets.</p><div class="grid" style="margin-bottom:0;"><div class="card"><div class="card-num">PROGRESS</div><h4>${overallProgress()}%</h4><p>Materi yang sudah selesai.</p></div><div class="card"><div class="card-num">KUIS</div><h4>${Object.keys(state.scores).length} kategori</h4><p>Nilai kuis tersimpan online.</p></div></div></div>${scores?`<h3 style="margin:20px 0 12px;">Nilai Kuis Terakhir</h3><div class="grid">${scores}</div>`:''}`;
+}
 
 /* ===================== STATE ===================== */
 let state = {
@@ -388,15 +433,14 @@ let state = {
 };
 
 async function loadStorage(){
-  try{ const ex = await window.storage.get('materi-tambahan', true); state.extra = ex ? JSON.parse(ex.value) : []; }catch(e){ state.extra = []; }
-  try{ const pr = await window.storage.get('progress', false); state.progress = pr ? JSON.parse(pr.value) : {}; }catch(e){ state.progress = {}; }
-  try{ const sc = await window.storage.get('quiz-scores', false); state.scores = sc ? JSON.parse(sc.value) : {}; }catch(e){ state.scores = {}; }
-  try{ const lk = await window.storage.get('materi-links', true); state.links = lk ? JSON.parse(lk.value) : {}; }catch(e){ state.links = {}; }
+  state.extra=JSON.parse(localStorage.getItem('tjkn_extra_materials')||'[]');
+  state.links=JSON.parse(localStorage.getItem('tjkn_material_links')||'{}');
+  state.progress={};state.scores={};await syncStudentData();
 }
-async function saveExtra(){ try{ await window.storage.set('materi-tambahan', JSON.stringify(state.extra), true); }catch(e){} }
-async function saveProgress(){ try{ await window.storage.set('progress', JSON.stringify(state.progress), false); }catch(e){} }
-async function saveScores(){ try{ await window.storage.set('quiz-scores', JSON.stringify(state.scores), false); }catch(e){} }
-async function saveLinks(){ try{ await window.storage.set('materi-links', JSON.stringify(state.links), true); }catch(e){} }
+async function saveExtra(){localStorage.setItem('tjkn_extra_materials',JSON.stringify(state.extra));}
+async function saveProgress(){localStorage.setItem('tjkn_progress_cache',JSON.stringify(state.progress));}
+async function saveScores(){localStorage.setItem('tjkn_scores_cache',JSON.stringify(state.scores));}
+async function saveLinks(){localStorage.setItem('tjkn_material_links',JSON.stringify(state.links));}
 
 function allMaterials(){ return MATERIALS.concat(state.extra); }
 function materialLink(m){ return state.links[m.id] || m.link || ''; }
@@ -628,9 +672,8 @@ function renderModal(){
 }
 
 async function toggleDone(id){
-  state.progress[id] = !state.progress[id];
-  await saveProgress();
-  render();
+  const status=!state.progress[id];state.progress[id]=status;
+  await saveProgress();await saveStudentProgress(id,status);render();
 }
 
 /* ===================== KUIS ===================== */
@@ -706,7 +749,7 @@ async function nextQuestion(){
   if(state.quizAnswers.length === QUIZ[state.quizCat].length){
     const correct = state.quizAnswers.filter(Boolean).length;
     state.scores[state.quizCat] = {correct, total: state.quizAnswers.length, date: new Date().toISOString()};
-    await saveScores();
+    await saveScores();await saveStudentScore(state.quizCat,correct,state.quizAnswers.length);
   }
   render();
 }
@@ -737,11 +780,13 @@ function escapeAttr(s){ return escapeHtml(s); }
 
 /* ===================== ROOT RENDER ===================== */
 function render(){
+  const badge=document.getElementById('studentBadge');if(badge)badge.innerHTML=studentBadge();
+  const app=document.getElementById('app');
+  if(!currentUser){document.getElementById('mainNav').innerHTML='';app.innerHTML=renderLogin();return;}
   renderNav();
-  const app = document.getElementById('app');
-  if(state.view==='dashboard') app.innerHTML = renderDashboard();
-  else if(state.view==='materi') app.innerHTML = renderMateri();
-  else if(state.view==='kuis') app.innerHTML = renderKuis();
+  if(state.view==='dashboard')app.innerHTML=renderDashboard()+renderStudentDashboard();
+  else if(state.view==='materi')app.innerHTML=renderMateri();
+  else if(state.view==='kuis')app.innerHTML=renderKuis();
 }
 
 (async function init(){
