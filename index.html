@@ -378,8 +378,17 @@ const ADMIN_BACKEND_PASSWORD = 'Riyan123';
 let adminPassword = sessionStorage.getItem('tjkn_admin_password') || '';
 
 async function apiRequest(action,payload={}){
-  const r=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});
-  const d=await r.json(); if(!d.ok) throw new Error(d.error||'API error'); return d;
+  const r=await fetch(GOOGLE_SCRIPT_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({action,...payload})
+  });
+  const text=await r.text();
+  let d;
+  try{ d=JSON.parse(text); }
+  catch(e){ throw new Error('Respons Apps Script bukan JSON: '+text.slice(0,300)); }
+  if(!d.ok) throw new Error(d.error||('API '+action+' gagal'));
+  return d;
 }
 function isAdmin(){ return adminMode; }
 async function syncOnlineData(){
@@ -623,6 +632,7 @@ async function submitUpload(){
     let fileData='',fileName='',mimeType='';
     if(file){fileName=file.name;mimeType=file.type||'application/octet-stream';fileData=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]||'');r.onerror=reject;r.readAsDataURL(file);});}
     await adminAddMaterial(cat,title,desc,link,fileName,fileData,mimeType);
+    alert('Materi berhasil disimpan ke Google Sheets.');
   }catch(e){alert('Materi gagal disimpan: '+e.message);btn.disabled=false;btn.textContent='Simpan Materi';}
 }
 
