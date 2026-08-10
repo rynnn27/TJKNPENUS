@@ -371,111 +371,57 @@ function iconServer(c){return `<svg width="16" height="16" viewBox="0 0 24 24" f
 
 /* ===================== GOOGLE SHEETS BACKEND ===================== */
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxO4cr45fj-yuKDhl_8q1ZDp2oSLdVAp9Iwyn-RxyhONOuQ5SeYkJUMytw4Ld1LWpjBxg/exec';
-let currentUser = JSON.parse(localStorage.getItem('tjkn_current_user') || 'null');
+let adminMode = sessionStorage.getItem('tjkn_admin_mode') === '1';
+let adminPassword = sessionStorage.getItem('tjkn_admin_password') || '';
 
 async function apiRequest(action,payload={}){
-  const r=await fetch(GOOGLE_SCRIPT_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action,...payload})
-  });
-  const d=await r.json();
-  if(!d.ok) throw new Error(d.error||'API error');
-  return d;
+  const r=await fetch(GOOGLE_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});
+  const d=await r.json(); if(!d.ok) throw new Error(d.error||'API error'); return d;
 }
-
-async function loginStudent(name,kelas){
-  if(!name.trim()||!kelas.trim()) throw new Error('Nama dan kelas wajib diisi.');
-  const d=await apiRequest('login',{name:name.trim(),kelas:kelas.trim()});
-  currentUser=d.user;
-  localStorage.setItem('tjkn_current_user',JSON.stringify(currentUser));
-  return currentUser;
-}
-
-function logoutStudent(){
-  currentUser=null;
-  localStorage.removeItem('tjkn_current_user');
-  render();
-}
-
+function isAdmin(){ return adminMode; }
 async function syncOnlineData(){
   try{
-    const d=await apiRequest('getData',{studentId:currentUser?currentUser.id:''});
-    state.extra=d.materials||[];
-    state.links={};
+    const d=await apiRequest('getData');
+    state.extra=d.materials||[]; state.links={};
     (d.materials||[]).forEach(m=>{if(m.link)state.links[m.id]=m.link;});
-    if(currentUser){
-      state.progress=d.progress||{};
-      state.scores=d.scores||{};
-    }
-  }catch(e){
-    console.warn(e);
-    if(!state.extra)state.extra=[];
-  }
+  }catch(e){ console.warn(e); state.extra=[]; }
 }
-
-function isAdmin(){
-  return !!currentUser && currentUser.role==='admin';
-}
-
-function renderLogin(){
-  return `<div class="panel" style="max-width:520px;margin:70px auto;">
-    <div class="eyebrow">TJKN.io · Akses Pembelajaran</div>
-    <h1 style="font-size:28px;margin-top:5px;">Masuk ke Peta Belajar</h1>
-    <p class="hint">Siswa cukup memasukkan nama dan kelas. Admin menggunakan nama <b>Riyan</b> dan kelas <b>ADMIN</b>.</p>
-    <div class="field"><label>Nama</label><input id="login-name" type="text" placeholder="Contoh: Ahmad"></div>
-    <div class="field"><label>Kelas</label><input id="login-class" type="text" placeholder="Contoh: XII TKJ 1 / ADMIN"></div>
-    <button class="btn primary block" onclick="doLogin()">Masuk</button>
-    <div id="login-status" style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center;"></div>
-  </div>`;
-}
-
-async function doLogin(){
-  const s=document.getElementById('login-status');
-  s.textContent='Menghubungkan...';
+async function enterAdminMode(){
+  const p=window.prompt('Password Admin:');
+  if(p===null)return;
   try{
-    await loginStudent(document.getElementById('login-name').value,document.getElementById('login-class').value);
-    await syncOnlineData();
+    const d=await apiRequest('checkAdmin',{password:p});
+    if(!d.ok)throw new Error('Password salah');
+    adminPassword=p; adminMode=true;
+    sessionStorage.setItem('tjkn_admin_mode','1'); sessionStorage.setItem('tjkn_admin_password',p);
     render();
-  }catch(e){s.textContent=e.message;}
+  }catch(e){alert('Akses admin ditolak.');}
 }
-
+function exitAdminMode(){
+  adminMode=false; adminPassword='';
+  sessionStorage.removeItem('tjkn_admin_mode'); sessionStorage.removeItem('tjkn_admin_password');
+  state.showUploadForm=false; render();
+}
 function studentBadge(){
-  if(!currentUser)return '';
-  const role=isAdmin()?'ADMIN':'SISWA';
   return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <span class="badge-done">👤 ${escapeHtml(currentUser.name)} · ${escapeHtml(currentUser.kelas)} · ${role}</span>
-    <button class="btn sm ghost" onclick="logoutStudent()">Keluar</button>
+    ${isAdmin()?`<span class="badge-done">🛠 MODE ADMIN</span><button class="btn sm ghost" onclick="exitAdminMode()">Keluar Admin</button>`:`<button class="btn sm ghost" onclick="enterAdminMode()">Admin</button>`}
   </div>`;
 }
-
-async function adminAddMaterial(cat,title,desc,link,fileName='',fileData='',mimeType=''){
+async function adminAddMaterial(cat,title,desc,link,fileName,fileData,mimeType){
   if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
-  const d=await apiRequest('addMaterial',{
-    adminId:currentUser.id,cat,title,desc,link,fileName,fileData,mimeType
-  });
-  state.extra=d.materials||state.extra;
-  state.links={};
+  const d=await apiRequest('addMaterial',{password:adminPassword,cat,title,desc,link,fileName,fileData,mimeType});
+  state.extra=d.materials||state.extra; state.links={};
   state.extra.forEach(m=>{if(m.link)state.links[m.id]=m.link;});
-  state.showUploadForm=false;
-  state.materiCat=cat;
-  render();
+  state.showUploadForm=false; state.materiCat=cat; render();
 }
-
 async function adminSetMaterialLink(id){
   if(!isAdmin()){alert('Hanya admin yang dapat mengubah link materi.');return;}
   const current=materialLink(allMaterials().find(x=>x.id===id)||{});
-  const url=window.prompt('Masukkan link materi:',current);
-  if(url===null)return;
-  const d=await apiRequest('setMaterialLink',{
-    adminId:currentUser.id,materialId:id,link:url.trim()
-  });
-  state.extra=d.materials||state.extra;
-  state.links={};
-  state.extra.forEach(m=>{if(m.link)state.links[m.id]=m.link;});
-  render();
+  const url=window.prompt('Masukkan link materi:',current); if(url===null)return;
+  const d=await apiRequest('setMaterialLink',{password:adminPassword,materialId:id,link:url.trim()});
+  state.extra=d.materials||state.extra; state.links={};
+  state.extra.forEach(m=>{if(m.link)state.links[m.id]=m.link;}); render();
 }
-
 /* ===================== STATE ===================== */
 let state = {
   view:'dashboard',
@@ -643,91 +589,35 @@ function renderCard(m,i,cat){
 }
 
 function renderUploadForm(){
-  return `
-  <div class="panel">
+  return `<div class="panel">
     <h3>Tambah Materi</h3>
-    <div class="hint">Hanya Admin yang dapat menambahkan materi. Siswa hanya melihat materi.</div>
-
-    <div class="field">
-      <label>Kategori</label>
-      <select id="up-cat">
-        ${Object.keys(CATS).map(k=>`<option value="${k}" ${state.materiCat===k?'selected':''}>${CATS[k].name}</option>`).join('')}
-      </select>
-    </div>
-
-    <div class="field">
-      <label>Judul Materi</label>
-      <input id="up-title" type="text" placeholder="Contoh: Konfigurasi DHCP Server">
-    </div>
-
-    <div class="field">
-      <label>Deskripsi</label>
-      <textarea id="up-desc" placeholder="Ringkasan singkat isi materi..."></textarea>
-    </div>
-
-    <div class="field">
-      <label>Upload File Materi</label>
-      <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.mp4">
-      <div class="filehint">File disimpan ke Google Drive melalui Apps Script. Maksimal 20 MB untuk upload langsung.</div>
-    </div>
-
-    <div class="field">
-      <label>Atau Link Materi</label>
-      <input id="up-link" type="url" placeholder="https://drive.google.com/...">
-      <div class="filehint">Boleh link Google Drive, PDF, PPT, YouTube, atau website materi.</div>
-    </div>
-
+    <div class="hint">Hanya Admin yang dapat menambah materi. Siswa hanya melihat dan membuka materi.</div>
+    <div class="field"><label>Kategori</label><select id="up-cat">${Object.keys(CATS).map(k=>`<option value="${k}" ${state.materiCat===k?'selected':''}>${CATS[k].name}</option>`).join('')}</select></div>
+    <div class="field"><label>Judul Materi</label><input id="up-title" type="text" placeholder="Contoh: Konfigurasi DHCP Server"></div>
+    <div class="field"><label>Deskripsi</label><textarea id="up-desc" placeholder="Ringkasan singkat isi materi..."></textarea></div>
+    <div class="field"><label>Upload File Materi</label><input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.mp4"><div class="filehint">File akan disimpan ke Google Drive. Maksimal 20 MB.</div></div>
+    <div class="field"><label>Atau Link Materi</label><input id="up-link" type="url" placeholder="https://drive.google.com/..."><div class="filehint">Boleh Google Drive, PDF, PPT, YouTube, atau website.</div></div>
     <button class="btn primary" id="up-submit-btn" onclick="submitUpload()">Simpan Materi</button>
   </div>`;
 }
-
+function toggleUpload(){ if(!isAdmin()){alert('Hanya admin.');return;} state.showUploadForm=!state.showUploadForm; render(); }
+function setMateriCat(k){state.materiCat=k;state.showUploadForm=false;render();}
 async function submitUpload(){
-  if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
-
-  const cat=document.getElementById('up-cat').value;
-  const title=document.getElementById('up-title').value.trim();
-  const desc=document.getElementById('up-desc').value.trim();
-  const link=document.getElementById('up-link').value.trim();
-  const fileInput=document.getElementById('up-file');
-  const file=fileInput && fileInput.files ? fileInput.files[0] : null;
-
+  if(!isAdmin()){alert('Hanya admin.');return;}
+  const cat=document.getElementById('up-cat').value, title=document.getElementById('up-title').value.trim(), desc=document.getElementById('up-desc').value.trim();
+  const link=document.getElementById('up-link').value.trim(), input=document.getElementById('up-file'), file=input?.files?.[0]||null;
   if(!title){alert('Judul materi wajib diisi.');return;}
-  if(!file && !link){alert('Masukkan link atau pilih file materi.');return;}
-  if(file && file.size > 20*1024*1024){
-    alert('Ukuran file maksimal 20 MB. Untuk file lebih besar gunakan link Google Drive.');
-    return;
-  }
-
-  const btn=document.getElementById('up-submit-btn');
-  btn.disabled=true;btn.textContent='Mengunggah...';
-
+  if(!file&&!link){alert('Pilih file atau isi link materi.');return;}
+  if(file&&file.size>20*1024*1024){alert('Ukuran file maksimal 20 MB.');return;}
+  const btn=document.getElementById('up-submit-btn'); btn.disabled=true; btn.textContent='Mengunggah...';
   try{
     let fileData='',fileName='',mimeType='';
-    if(file){
-      fileName=file.name;
-      mimeType=file.type||'application/octet-stream';
-      fileData=await new Promise((resolve,reject)=>{
-        const reader=new FileReader();
-        reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');
-        reader.onerror=reject;
-        reader.readAsDataURL(file);
-      });
-    }
+    if(file){fileName=file.name;mimeType=file.type||'application/octet-stream';fileData=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]||'');r.onerror=reject;r.readAsDataURL(file);});}
     await adminAddMaterial(cat,title,desc,link,fileName,fileData,mimeType);
-  }catch(e){
-    alert('Materi gagal disimpan: '+e.message);
-    btn.disabled=false;btn.textContent='Simpan Materi';
-  }
+  }catch(e){alert('Materi gagal disimpan: '+e.message);btn.disabled=false;btn.textContent='Simpan Materi';}
 }
-
-async function toggleUpload(){
-  if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
-  state.showUploadForm=!state.showUploadForm;render();
-}
-function setMateriCat(k){state.materiCat=k;state.showUploadForm=false;render();}
 
 /* ===================== MODAL ===================== */
-
 function openNode(id){ state.modalNode=id; render(); }
 function closeModal(){ state.modalNode=null; render(); }
 
@@ -770,11 +660,7 @@ function renderModal(){
   </div>`;
 }
 
-async function toggleDone(id){
-  if(!isAdmin())return;
-  const status=!state.progress[id];state.progress[id]=status;
-  await saveProgress();render();
-}
+async function toggleDone(id){ if(!isAdmin())return; }
 
 /* ===================== KUIS ===================== */
 function renderKuis(){
@@ -882,9 +768,8 @@ function escapeAttr(s){ return escapeHtml(s); }
 function render(){
   const badge=document.getElementById('studentBadge');if(badge)badge.innerHTML=studentBadge();
   const app=document.getElementById('app');
-  if(!currentUser){document.getElementById('mainNav').innerHTML='';app.innerHTML=renderLogin();return;}
   renderNav();
-  if(state.view==='dashboard')app.innerHTML=renderDashboard()+renderStudentDashboard();
+  if(state.view==='dashboard')app.innerHTML=renderDashboard();
   else if(state.view==='materi')app.innerHTML=renderMateri();
   else if(state.view==='kuis' && isAdmin())app.innerHTML=renderKuis();
   else { state.view='materi'; app.innerHTML=renderMateri(); }
