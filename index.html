@@ -449,10 +449,10 @@ function studentBadge(){
   </div>`;
 }
 
-async function adminAddMaterial(cat,title,desc,link){
+async function adminAddMaterial(cat,title,desc,link,fileName='',fileData='',mimeType=''){
   if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
   const d=await apiRequest('addMaterial',{
-    adminId:currentUser.id,cat,title,desc,link
+    adminId:currentUser.id,cat,title,desc,link,fileName,fileData,mimeType
   });
   state.extra=d.materials||state.extra;
   state.links={};
@@ -646,57 +646,88 @@ function renderUploadForm(){
   return `
   <div class="panel">
     <h3>Tambah Materi</h3>
-    <div class="hint">Materi tambahan akan tampil untuk semua pengguna di kategori yang dipilih.</div>
+    <div class="hint">Hanya Admin yang dapat menambahkan materi. Siswa hanya melihat materi.</div>
+
     <div class="field">
       <label>Kategori</label>
       <select id="up-cat">
         ${Object.keys(CATS).map(k=>`<option value="${k}" ${state.materiCat===k?'selected':''}>${CATS[k].name}</option>`).join('')}
       </select>
     </div>
+
     <div class="field">
       <label>Judul Materi</label>
       <input id="up-title" type="text" placeholder="Contoh: Konfigurasi DHCP Server">
     </div>
+
     <div class="field">
       <label>Deskripsi</label>
-      <textarea id="up-desc" placeholder="Ringkasan singkat isi materi ini..."></textarea>
+      <textarea id="up-desc" placeholder="Ringkasan singkat isi materi..."></textarea>
     </div>
+
     <div class="field">
-      <label>Link Materi — Google Drive, PPT, PDF, dsb (opsional)</label>
-      <input id="up-link" type="text" placeholder="https://drive.google.com/...">
-      <div class="filehint">Tempel link share dari Google Drive. Pastikan akses diatur "siapa saja yang memiliki link".</div>
+      <label>Upload File Materi</label>
+      <input id="up-file" type="file" accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.png,.jpg,.jpeg,.mp4">
+      <div class="filehint">File disimpan ke Google Drive melalui Apps Script. Maksimal 20 MB untuk upload langsung.</div>
     </div>
+
+    <div class="field">
+      <label>Atau Link Materi</label>
+      <input id="up-link" type="url" placeholder="https://drive.google.com/...">
+      <div class="filehint">Boleh link Google Drive, PDF, PPT, YouTube, atau website materi.</div>
+    </div>
+
     <button class="btn primary" id="up-submit-btn" onclick="submitUpload()">Simpan Materi</button>
   </div>`;
 }
 
-function toggleUpload(){ state.showUploadForm = !state.showUploadForm; render(); }
-function setMateriCat(k){ state.materiCat=k; state.showUploadForm=false; render(); }
-
 async function submitUpload(){
   if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
+
   const cat=document.getElementById('up-cat').value;
   const title=document.getElementById('up-title').value.trim();
   const desc=document.getElementById('up-desc').value.trim();
   const link=document.getElementById('up-link').value.trim();
+  const fileInput=document.getElementById('up-file');
+  const file=fileInput && fileInput.files ? fileInput.files[0] : null;
+
   if(!title){alert('Judul materi wajib diisi.');return;}
+  if(!file && !link){alert('Masukkan link atau pilih file materi.');return;}
+  if(file && file.size > 20*1024*1024){
+    alert('Ukuran file maksimal 20 MB. Untuk file lebih besar gunakan link Google Drive.');
+    return;
+  }
+
   const btn=document.getElementById('up-submit-btn');
-  if(btn){btn.disabled=true;btn.textContent='Menyimpan...';}
+  btn.disabled=true;btn.textContent='Mengunggah...';
+
   try{
-    await adminAddMaterial(cat,title,desc,link);
+    let fileData='',fileName='',mimeType='';
+    if(file){
+      fileName=file.name;
+      mimeType=file.type||'application/octet-stream';
+      fileData=await new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');
+        reader.onerror=reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    await adminAddMaterial(cat,title,desc,link,fileName,fileData,mimeType);
   }catch(e){
     alert('Materi gagal disimpan: '+e.message);
-    if(btn){btn.disabled=false;btn.textContent='Simpan Materi';}
+    btn.disabled=false;btn.textContent='Simpan Materi';
   }
 }
 
-function toggleUpload(){
+async function toggleUpload(){
   if(!isAdmin()){alert('Hanya admin yang dapat menambah materi.');return;}
   state.showUploadForm=!state.showUploadForm;render();
 }
 function setMateriCat(k){state.materiCat=k;state.showUploadForm=false;render();}
 
 /* ===================== MODAL ===================== */
+
 function openNode(id){ state.modalNode=id; render(); }
 function closeModal(){ state.modalNode=null; render(); }
 
@@ -726,8 +757,8 @@ function renderModal(){
             ${isAdmin()?`<button class="btn sm ghost" onclick="adminSetMaterialLink('${m.id}')">Ubah Link</button>`:''}
           </div>
         ` : `
-          <div class="file-empty">Belum ada link materi (PPT/PDF di Google Drive) untuk topik ini.</div>
-          <button class="btn sm" onclick="setMaterialLink('${m.id}')">+ Tambah Link Drive</button>
+          <div class="file-empty">${isAdmin() ? 'Belum ada file/link materi untuk topik ini.' : 'Materi belum memiliki file atau link. Silakan tunggu Admin menambahkan materi.'}</div>
+          ${isAdmin()?`<button class="btn sm" onclick="adminSetMaterialLink('${m.id}')">+ Tambah Link Drive</button>`:''}
         `}
       </div>
 
