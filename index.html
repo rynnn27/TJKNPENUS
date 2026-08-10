@@ -239,7 +239,7 @@ const CATS = {
 };
 
 const MATERIALS = [
-  {id:'j1',cat:'jaringan',title:'Konsep Dasar IP Address',desc:'Struktur alamat IPv4, pembagian kelas, serta perbedaan network ID dan host ID.'},
+  {id:'j1',cat:'jaringan',title:'Konsep Dasar IP Address',desc:'Struktur alamat IPv4, pembagian kelas, serta perbedaan network ID dan host ID.',link:'https://docs.google.com/presentation/d/1Mbu-zDXtP9Fpv1iIAlfGLY0zDbJ5-StX/edit?usp=drive_link&ouid=111260762170717500831&rtpof=true&sd=true'},
   {id:'j2',cat:'jaringan',title:'Konsep Dasar Subnetting',desc:'Notasi CIDR, VLSM, dan cara menghitung jumlah subnet serta host yang tersedia.'},
   {id:'j3',cat:'jaringan',title:'Konfigurasi Dasar Jaringan',desc:'Pengalamatan perangkat, routing sederhana, dan pengujian koneksi antar host.'},
   {id:'j4',cat:'jaringan',title:'Konfigurasi Wireless',desc:'Pengaturan SSID, mode keamanan WPA2, dan penempatan access point.'},
@@ -370,7 +370,7 @@ function iconServer(c){return `<svg width="16" height="16" viewBox="0 0 24 24" f
 
 
 /* ===================== GOOGLE SHEETS BACKEND ===================== */
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxO4cr45fj-yuKDhl_8q1ZDp2oSLdVAp9Iwyn-RxyhONOuQ5SeYkJUMytw4Ld1LWpjBxg/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDJSGTXfXOaPvLNAnf4tMRJAs1BnODVM0eh0z50pvrK2TOEJgC9FaQlDNT6iFIxbaP/exec';
 let adminMode = sessionStorage.getItem('tjkn_admin_mode') === '1';
 const ADMIN_UI_PASSWORD = 'Riyan123';
 // Kompatibilitas dengan deployment Apps Script lama.
